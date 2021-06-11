@@ -1,5 +1,6 @@
 package com.example.lumenassignment.util.graph
 
+import android.graphics.Rect
 import com.example.lumenassignment.assignment.lumen.me.model.GraphDetails
 
 interface IGraphHelper {
@@ -9,5 +10,5 @@ interface IGraphHelper {
      *
      * @return [GraphDetails]
      */
-    fun createGraphDetails(listPoint: List<Float>) : GraphDetails
+    fun createGraphDetails(listPoint: List<Float>, rect: Rect) : GraphDetails
 }

@@ -1,43 +1,30 @@
 package com.example.lumenassignment.util.graph
 
 import android.content.res.Resources
+import android.graphics.Rect
 import com.example.lumenassignment.assignment.lumen.me.model.GraphDetails
-import kotlin.math.abs
 
 class GraphHelper(
     private val resources: Resources,
     private val xStep: Float
 ) : IGraphHelper {
+    private var newMin = 0F
+    private var newMax = 0F
 
-    override fun createGraphDetails(listPoint: List<Float>): GraphDetails {
-        val heightPixels = (resources
-            .displayMetrics.heightPixels).toFloat()
-        val gap = (heightPixels * 0.02).toFloat()
-        val heightPixelsMinusGap = (heightPixels - gap)
+    override fun createGraphDetails(listPoint: List<Float>, rect: Rect): GraphDetails {
 
+        newMax = rect.bottom.toFloat()
+        newMin = rect.top.toFloat()
 
-        var min = listPoint.minOrNull() ?: 0F
-        var max = listPoint.maxOrNull() ?: 0F
-        val offset = (abs(min))
+        var min = listPoint.minByOrNull { -it } ?: 0F
+        var max = listPoint.maxByOrNull { -it } ?: 0F
 
-        val proportion = when {
-            min < 0 -> {
-                heightPixelsMinusGap / (max - min + offset)
-            }
-            max > heightPixelsMinusGap -> {
-                (max - heightPixelsMinusGap) / max
-            }
-            else -> {
-                1F
-            }
-        }
-
-        val listsYPoints = getListsYPoints(proportion, listPoint, min, offset)
+        val listsYPoints = getListsYPoints(listPoint, min, max)
 
         min = listsYPoints.minOrNull() ?: 0F
         max = listsYPoints.maxOrNull() ?: 0F
 
-        val xAxis = (min + max) / 2
+        val xAxis = ((max - min) / 2)
 
         return GraphDetails(
             xStep,
@@ -47,22 +34,26 @@ class GraphHelper(
 
     }
 
-    private fun getListsYPoints(
-        proportion: Float,
-        listPoint: List<Float>,
-        min: Float,
-        offset: Float
-    ): List<Float> {
+    private fun scalePoint(oldValue: Float, oldMin: Float, oldMax: Float): Float {
+
+        val newValue: Float
+        val newRange: Float
+        val oldRange = (oldMax - oldMin)
+        if (oldRange == 0F)
+            newValue = newMin
+        else {
+            newRange = (newMax - newMin)
+            newValue = (((oldValue - oldMin) * newRange) / oldRange) + newMin
+        }
+
+        return newValue
+    }
+
+    private fun getListsYPoints(listPoint: List<Float>, min: Float, max: Float): List<Float> {
         return listPoint.map { point ->
-            return@map if (proportion != 1F) {
-                if (min < 0) {
-                    (point + offset) * proportion
-                } else {
-                    point * proportion
-                }
-            } else {
-                point
-            }
+            val newPoint = scalePoint(point, min, max)
+
+            return@map newPoint
         }
     }
 

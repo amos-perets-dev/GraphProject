@@ -1,5 +1,6 @@
 package com.example.lumenassignment.screens
 
+import android.graphics.Rect
 import com.example.lumenassignment.assignment.lumen.me.model.BreathItem
 import com.example.lumenassignment.assignment.lumen.me.model.GraphDetails
 import com.example.lumenassignment.lumen_app.base.ViewModelBase
@@ -14,10 +15,10 @@ class ScreensViewModel(
 ) :
     ViewModelBase() {
 
-    fun getData(): Observable<GraphDetails>? {
+    fun getData(rect: Rect): Observable<GraphDetails>? {
         return repo.getPointsById(date)
             ?.map {
-                graphHelper.createGraphDetails(it)
+                graphHelper.createGraphDetails(it, rect)
             }
     }
 

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">LumenAssignment</string>
+    <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="home_page_fragment_label">Home Page Fragment</string>
+    <string name="graph_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <string name="home_page_breath_state_valid">Valid</string>
+    <string name="home_page_breath_state_invalid">Aborted</string>
+    <string name="home_page_breath_main_title">Breaths</string>
+</resources>

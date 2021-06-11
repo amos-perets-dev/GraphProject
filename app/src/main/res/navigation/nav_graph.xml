@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/HomePageFragment">
+
+    <fragment
+        android:id="@+id/HomePageFragment"
+        android:name="com.example.lumenassignment.screens.home_page.HomePageFragment"
+        android:label="@string/home_page_fragment_label"
+        tools:layout="@layout/fragment_home_page">
+
+        <action
+            android:id="@+id/action_HomePageFragment_to_GraphFragment"
+            app:destination="@id/DetailsFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/DetailsFragment"
+        android:name="com.example.lumenassignment.screens.details.GraphFragment"
+        android:label="@string/graph_fragment_label"
+        tools:layout="@layout/fragment_graph">
+
+        <argument
+            android:name="breathDate"
+            app:argType="string"
+            app:nullable="false" />
+
+    </fragment>
+</navigation>

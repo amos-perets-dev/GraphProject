@@ -38,13 +38,13 @@ class MediaPlayerManager(private val intervalGraphDraw: Long) : IMediaPlayerMana
     }
 
     private fun playFast(index: Int) {
-
         dispose()
         if (index <= indexPoint) {
 
             eraseGraph.index = index
             notifyState(eraseGraph)
             indexPoint = index
+
         } else {
 
             drawGraph.index = index
@@ -54,13 +54,14 @@ class MediaPlayerManager(private val intervalGraphDraw: Long) : IMediaPlayerMana
     }
 
     override fun play(interval: Long) {
+
         dispose()
         disposable = getInterval(intervalGraphDraw)
-            .filter { indexPoint < progressLength }
+            .filter { indexPoint + 1 < progressLength }
             .doOnNext {
+                indexPoint++
                 drawGraph.index = indexPoint
                 notifyState(drawGraph)
-                indexPoint++
             }
             ?.subscribePro()
     }
@@ -82,17 +83,16 @@ class MediaPlayerManager(private val intervalGraphDraw: Long) : IMediaPlayerMana
 
         if (indexPoint - 1 < 0) return
         disposable = getInterval(intervalGraphDraw)
-            .filter { indexPoint + 1 >= 0 }
+            .filter { indexPoint >= 0 }
             .doOnNext {
+                indexPoint--
                 eraseGraph.index = indexPoint
                 notifyState(eraseGraph)
-                indexPoint--
             }
             .subscribePro()
     }
 
     private fun notifyState(graphState: GraphState) {
-
         graphState.index = indexPoint
         progressPoint.onNext(graphState)
     }

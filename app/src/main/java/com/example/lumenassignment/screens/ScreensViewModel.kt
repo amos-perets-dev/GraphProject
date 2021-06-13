@@ -22,6 +22,7 @@ class ScreensViewModel(
     ViewModelBase() {
 
     val pointsGraph = MutableLiveData<Int>()
+    val graphDetails = MutableLiveData<GraphDetails>()
     val currProgress = MutableLiveData<GraphState>()
 
     init {
@@ -35,8 +36,8 @@ class ScreensViewModel(
             }
     }
 
-    fun getData(top: Int, bottom: Int): Observable<GraphDetails>? {
-        return repo.getPointsById(date)
+    fun getData(top: Int, bottom: Int) {
+        repo.getPointsById(date)
             ?.map { points ->
                 graphHelper.createGraphDetails(points, top, bottom)
             }
@@ -44,7 +45,15 @@ class ScreensViewModel(
                 val size = it.flowYPoints.size
                 mediaPlayerManager.addProgressLength(size)
                 pointsGraph.postValue(size)
+                graphDetails.postValue(it)
             }
+            ?.subscribePro()
+            ?.let {
+                compositeDisposable.add(
+                    it
+                )
+            }
+
     }
 
     fun loadData(): Observable<List<BreathItem>>? {

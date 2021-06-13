@@ -46,16 +46,21 @@ class GraphFragment : FragmentBase() {
 
         compositeDisposable.add(
             RxView.layoutChanges(graphView)
-                .flatMap {
+                .doOnNext {
                     graphViewModel.getData(graphView.top, graphView.bottom)
                 }
-                .doOnNext(graphView::setGraphDetails)
                 .subscribePro()
         )
 
         graphViewModel.pointsGraph.observe(
             viewLifecycleOwner,
             Observer { mediaPlayerViewHolder?.setProgressLength(it) }
+        )
+
+
+        graphViewModel.graphDetails.observe(
+            viewLifecycleOwner,
+            Observer(graphView::setGraphDetails)
         )
 
         graphViewModel.currProgress.observe(
@@ -81,7 +86,7 @@ class GraphFragment : FragmentBase() {
     }
 
     override fun onDestroyView() {
-//        graphView.dispose()
+        graphView.dispose()
         super.onDestroyView()
     }
 }

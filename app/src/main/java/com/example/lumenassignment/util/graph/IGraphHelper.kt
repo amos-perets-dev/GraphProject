@@ -7,8 +7,10 @@ interface IGraphHelper {
 
     /**
      * Create details for the grph view [GraphView]
-     *
+     *@param listPoint values on the line
+     * @param top graph
+     * @param bottom graph
      * @return [GraphDetails]
      */
-    fun createGraphDetails(listPoint: List<Float>, rect: Rect) : GraphDetails
+    fun createGraphDetails(listPoint: List<Float>, top: Int, bottom: Int): GraphDetails
 }

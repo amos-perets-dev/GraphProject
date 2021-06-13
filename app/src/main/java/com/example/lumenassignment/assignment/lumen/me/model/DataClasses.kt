@@ -1,5 +1,8 @@
 package com.example.lumenassignment.assignment.lumen.me.model
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
+import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.example.lumenassignment.R
 import com.google.gson.annotations.SerializedName
@@ -32,9 +35,40 @@ interface IBreathItem {
 }
 
 class GraphDetails(
-    val xStepDp : Float = 0F,
-    val xAxis : Float = 0F,
-    var flowYPoints: List<Float> = arrayListOf()
+    val xStepDp: Float = 0F,
+    val xAxis: Float = 0F,
+    var flowYPoints: List<Float> = arrayListOf(),
+    val intervalGraphDraw: Int
 )
+
+sealed class MediaPlayerState {
+    open var index = 0
+
+    object Play : MediaPlayerState()
+
+    object PlayFast : MediaPlayerState()
+
+    object Pause : MediaPlayerState()
+
+    object Rewind : MediaPlayerState()
+
+    object None : MediaPlayerState()
+
+}
+
+sealed class GraphState {
+    open var index = 0
+    open val xfermode: PorterDuffXfermode? = null
+
+    object DrawGraph : GraphState() {
+        override val xfermode: PorterDuffXfermode? get() = null
+    }
+
+    object StopDraw : GraphState()
+
+    object EraseGraph : GraphState(){
+        override val xfermode: PorterDuffXfermode get() =  PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+    }
+}
 
 

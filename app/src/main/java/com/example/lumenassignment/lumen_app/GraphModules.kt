@@ -3,8 +3,12 @@ package com.example.lumenassignment.lumen_app
 import android.content.Context
 import com.example.lumenassignment.BuildConfig
 import com.example.lumenassignment.R
-import com.example.lumenassignment.manager.ParseJsonManager
-import com.example.lumenassignment.manager.IParseJsonManager
+import com.example.lumenassignment.lumen_app.configuration.GraphConfiguration
+import com.example.lumenassignment.lumen_app.configuration.IGraphConfiguration
+import com.example.lumenassignment.manager.media_player.IMediaPlayerManager
+import com.example.lumenassignment.manager.media_player.MediaPlayerManager
+import com.example.lumenassignment.manager.parse.ParseJsonManager
+import com.example.lumenassignment.manager.parse.IParseJsonManager
 import com.example.lumenassignment.repo.BreathRepo
 import com.example.lumenassignment.repo.IBreathRepo
 import com.example.lumenassignment.screens.home_page.BreathAdapter
@@ -17,7 +21,7 @@ import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
-class LumenModules {
+class GraphModules {
     fun createModules(context: Context): List<Module> {
 
         val appModules = createAppModules(context)
@@ -40,10 +44,21 @@ class LumenModules {
                 BreathAdapter()
             }
 
+            factory<IGraphConfiguration> {
+                GraphConfiguration(context)
+            }
+
             factory<IGraphHelper> {
                 val resources = context.resources
                 val xStep = resources.getDimension(R.dimen.graph_line_x_axis_step)
-                return@factory GraphHelper(resources, xStep)
+                val intervalGraphDraw = resources.getInteger(R.integer.interval_graph_draw)
+                return@factory GraphHelper(intervalGraphDraw, xStep)
+            }
+
+            factory<IMediaPlayerManager> {
+                val resources = context.resources
+                val intervalGraphDraw = resources.getInteger(R.integer.interval_graph_draw)
+                return@factory MediaPlayerManager(intervalGraphDraw.toLong())
             }
 
 
@@ -52,7 +67,7 @@ class LumenModules {
 
     private fun createHomePageModule(): Module {
         return module {
-            viewModel { (date: String) -> ScreensViewModel(date, get(), get()) }
+            viewModel { (date: String) -> ScreensViewModel(date, get(), get(), get()) }
         }
     }
 

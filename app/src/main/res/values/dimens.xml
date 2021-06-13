@@ -1,5 +1,8 @@
 <resources>
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="graph_line_x_axis_step">2dp</dimen>
+    <dimen name="graph_line_x_axis_width">0.8dp</dimen>
+    <dimen name="graph_line_width">1.2dp</dimen>
+    <integer name="interval_graph_draw">100</integer>
 
 </resources>

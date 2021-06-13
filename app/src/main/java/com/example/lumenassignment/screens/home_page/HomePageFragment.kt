@@ -8,6 +8,7 @@ import com.example.lumenassignment.R
 import com.example.lumenassignment.lumen_app.base.FragmentBase
 import com.example.lumenassignment.screens.ScreensViewModel
 import com.example.lumenassignment.screens.home_page.HomePageFragmentDirections.Companion.actionHomePageFragmentToGraphFragment
+import com.example.lumenassignment.subscribePro
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.internal.functions.Functions
 import kotlinx.android.synthetic.main.fragment_home_page.view.*
@@ -38,7 +39,7 @@ class HomePageFragment : FragmentBase() {
             ?.observeOn(AndroidSchedulers.mainThread())
             ?.doOnNext(breathAdapter::submitList)
             ?.doOnNext(Functions.actionConsumer(this::hideLoader))
-            ?.subscribe({}, Throwable::printStackTrace)
+            ?.subscribePro()
             ?.let {
                 compositeDisposable.add(
                     it
@@ -49,7 +50,7 @@ class HomePageFragment : FragmentBase() {
             .onClick()
             ?.map { actionHomePageFragmentToGraphFragment(it) }
             ?.doOnNext(findNavController()::navigate)
-            ?.subscribe({}, Throwable::printStackTrace)
+            ?.subscribePro()
             ?.let {
                 compositeDisposable.add(
                     it

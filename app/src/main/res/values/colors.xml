@@ -7,6 +7,7 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="graph_line_color">#5D0B6A</color>
-    <color name="graph_background_color">#E7E0E8</color>
+    <color name="graph_line_color">#B40CCF</color>
+    <color name="graph_background_color">#ECECEC</color>
+    <color name="graph_x_axis_line_color">#EC1818</color>
 </resources>

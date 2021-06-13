@@ -4,7 +4,7 @@ import android.app.Application
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 
-class LumenApplication : Application() {
+class GraphApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
@@ -12,7 +12,7 @@ class LumenApplication : Application() {
             // Android context
             androidContext(applicationContext)
             // modules
-            modules(LumenModules().createModules(applicationContext))
+            modules(GraphModules().createModules(applicationContext))
         }
     }
 }

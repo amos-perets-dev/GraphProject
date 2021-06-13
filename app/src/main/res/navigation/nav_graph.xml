@@ -18,7 +18,7 @@
 
     <fragment
         android:id="@+id/DetailsFragment"
-        android:name="com.example.lumenassignment.screens.details.GraphFragment"
+        android:name="com.example.lumenassignment.screens.graph.GraphFragment"
         android:label="@string/graph_fragment_label"
         tools:layout="@layout/fragment_graph">
 

@@ -1,9 +1,9 @@
-package com.example.lumenassignment.manager
+package com.example.lumenassignment.manager.parse
 
 import android.content.Context
-import android.util.Log
 import com.example.lumenassignment.assignment.lumen.me.model.BreathItem
 import com.example.lumenassignment.repo.IBreathRepo
+import com.example.lumenassignment.subscribePro
 import com.google.gson.Gson
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
@@ -26,7 +26,7 @@ class ParseJsonManager(
             .map(this::parseJson)
             .map { caretMap(it) }
             .doOnNext(repo::addData)
-            .subscribe({}, Throwable::printStackTrace)
+            ?.subscribePro()
     }
 
     private fun parseJson(json: String): Array<BreathItem>? {

@@ -9,7 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
-        android:name=".lumen_app.LumenApplication"
+        android:name=".lumen_app.GraphApplication"
         android:theme="@style/Theme.LumenAssignment">
         <activity
             android:name=".screens.main.MainActivity"

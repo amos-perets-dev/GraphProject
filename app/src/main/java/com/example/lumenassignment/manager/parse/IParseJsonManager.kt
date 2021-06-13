@@ -1,4 +1,4 @@
-package com.example.lumenassignment.manager
+package com.example.lumenassignment.manager.parse
 
 import io.reactivex.disposables.Disposable
 

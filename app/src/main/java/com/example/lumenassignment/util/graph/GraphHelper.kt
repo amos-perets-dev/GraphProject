@@ -1,20 +1,20 @@
 package com.example.lumenassignment.util.graph
 
 import android.content.res.Resources
-import android.graphics.Rect
+import com.example.lumenassignment.R
 import com.example.lumenassignment.assignment.lumen.me.model.GraphDetails
 
 class GraphHelper(
-    private val resources: Resources,
+    private val intervalGraphDraw: Int,
     private val xStep: Float
 ) : IGraphHelper {
     private var newMin = 0F
     private var newMax = 0F
 
-    override fun createGraphDetails(listPoint: List<Float>, rect: Rect): GraphDetails {
+    override fun createGraphDetails(listPoint: List<Float>, top: Int, bottom: Int): GraphDetails {
 
-        newMax = rect.bottom.toFloat()
-        newMin = rect.top.toFloat()
+        newMax = bottom.toFloat()
+        newMin = top.toFloat()
 
         var min = listPoint.minByOrNull { -it } ?: 0F
         var max = listPoint.maxByOrNull { -it } ?: 0F
@@ -29,7 +29,8 @@ class GraphHelper(
         return GraphDetails(
             xStep,
             xAxis,
-            listsYPoints
+            listsYPoints,
+            intervalGraphDraw.toInt()
         )
 
     }

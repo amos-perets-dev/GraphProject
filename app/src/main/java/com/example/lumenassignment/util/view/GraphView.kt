@@ -5,95 +5,185 @@ import android.content.Context
 import android.graphics.*
 import android.util.AttributeSet
 import android.util.Log
+import android.view.GestureDetector
+import android.view.GestureDetector.SimpleOnGestureListener
+import android.view.MotionEvent
 import android.view.View
+import android.widget.OverScroller
 import androidx.annotation.ColorRes
 import androidx.core.content.ContextCompat
+import androidx.interpolator.view.animation.FastOutLinearInInterpolator
 import com.example.lumenassignment.R
 import com.example.lumenassignment.assignment.lumen.me.model.GraphDetails
+import com.example.lumenassignment.assignment.lumen.me.model.GraphState
 import io.reactivex.Observable
-import io.reactivex.Single
-import io.reactivex.subjects.PublishSubject
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
+import java.util.concurrent.TimeUnit
 
 
-class GraphView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
-
-    private val finishDraw = PublishSubject.create<Rect>()
-
-    init {
-        if (context != null) {
-            setBackgroundColor(ContextCompat.getColor(context, R.color.graph_background_color))
-        }
-        invalidate()
-    }
+class GraphView(context: Context, attrs: AttributeSet?) :
+    View(context, attrs) {
+    var mScroller = OverScroller(getContext(), FastOutLinearInInterpolator());
 
     private var graphDetails: GraphDetails? = null
 
-    private var colorGraphLine =
-        context?.let { ContextCompat.getColor(it, R.color.graph_line_color) }
+    private var graphLineColor = ContextCompat.getColor(context, R.color.graph_line_color)
+    private var graphLineWidth = context.resources.getDimension(R.dimen.graph_line_width)
 
-    private val paint = Paint().apply {
-        if (context == null) return@apply
-        color = ContextCompat.getColor(context, R.color.graph_line_color)
+    private var xAxisLineColor = ContextCompat.getColor(context, R.color.graph_x_axis_line_color)
+    private var xAxisLineWidth = context.resources.getDimension(R.dimen.graph_line_x_axis_width)
+
+    private var backgroundGraphColor =
+        ContextCompat.getColor(context, R.color.graph_background_color)
+
+    private var distance = 0F
+    private var graphWidth = 0
+
+    private var isValidDraw = false
+
+    private var indexPoint = 0
+
+    private val gestureDetector =
+        GestureDetector(getContext(), object : SimpleOnGestureListener() {
+            override fun onScroll(
+                e1: MotionEvent, e2: MotionEvent,
+                distanceX: Float, distanceY: Float
+            ): Boolean {
+                // Note 0 as the x-distance to prevent horizontal scrolling
+                val currDistanceX = distanceX.toInt()
+
+                if ((distance + currDistanceX + width).toInt() in width..graphWidth) {
+                    distance += distanceX
+                    scrollBy(currDistanceX, 0)
+                }
+                return true
+            }
+
+            override fun onFling(
+                e1: MotionEvent, e2: MotionEvent,
+                velocityX: Float, velocityY: Float
+            ): Boolean {
+
+                val maxScrollX = graphWidth - width
+
+                mScroller.forceFinished(true)
+
+                mScroller.fling(
+                    scrollX,  // No startX as there is no horizontal scrolling
+                    0,
+                    (-velocityX).toInt(),  // No velocityX as there is no horizontal scrolling
+                    0,
+                    0,
+                    maxScrollX,
+                    0,
+                    0
+                )
+
+                invalidate()
+
+                return true
+            }
+
+            override fun onDown(e: MotionEvent): Boolean {
+                if (!mScroller.isFinished) {
+                    mScroller.forceFinished(true)
+                }
+                return true
+            }
+        })
+
+
+    private val graphLinePaint = Paint().apply {
+        color = graphLineColor
         style = Paint.Style.STROKE
-        strokeWidth = 2.5F
+        strokeWidth = graphLineWidth
     }
 
+    private val xAxisLinePaint = Paint().apply {
+        color = xAxisLineColor
+        style = Paint.Style.STROKE
+        strokeWidth = xAxisLineWidth
+    }
 
     @SuppressLint("DrawAllocation")
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        Log.d("TEST_GAME", "GraphView onDraw")
-        val clipBounds = canvas.clipBounds
-        finishDraw.onNext(clipBounds)
+
+        if (graphDetails == null || isValidDraw.not()) return
+
+
+        if (mScroller.computeScrollOffset()) {
+            scrollTo(mScroller.currX, mScroller.currY);
+        }
 
         val xStep = graphDetails?.xStepDp ?: 0F
         val flowYPoints = graphDetails?.flowYPoints ?: arrayListOf()
 
-        val lp = layoutParams
-
         val newWidth = (flowYPoints.size * xStep).toInt()
-        if (newWidth > this.width) {
-            lp.width = newWidth
-            layoutParams = lp
-            requestLayout()
+        graphWidth = if (newWidth > this.width) {
+            newWidth
+        } else {
+            width
         }
-
-        val width = canvas.clipBounds.width()
 
         val xAxis = graphDetails?.xAxis
 
         if (xAxis != null) {
-            paint.color = Color.RED
-            canvas.drawLine(0F, xAxis, width.toFloat(), xAxis, paint)
+            canvas.drawLine(0F, xAxis, graphWidth.toFloat(), xAxis, xAxisLinePaint)
         }
-
-        paint.color = colorGraphLine ?: Color.BLACK
-        paint.strokeWidth = 1F
 
         val path = Path()
         path.moveTo(0F, (flowYPoints.firstOrNull() ?: 0F))
 
-        for (i in flowYPoints.indices) {
+        for (index in 0..indexPoint) {
 
-            val yPoint = flowYPoints[i]
+            val yPoint = flowYPoints[index]
 
-            path.lineTo(((xStep * (i + 1))), yPoint)
+            path.lineTo(((xStep * (index + 1))), yPoint)
         }
-        canvas.drawPath(path, paint)
+        canvas.drawPath(path, graphLinePaint)
+
     }
 
-    fun isFinishDraw(): Single<Rect>? {
-        return finishDraw.hide()
-            .firstOrError()
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        return gestureDetector.onTouchEvent(event)
     }
 
-    fun setColorGraphLine(@ColorRes color: Int) {
-        this.colorGraphLine = color
+    fun setGraphLineColor(@ColorRes color: Int): GraphView {
+        this.graphLineColor = color
+        return this
     }
 
-    fun setYPoints(graphDetails: GraphDetails) {
+    fun setBackgroundGraphColor(@ColorRes color: Int): GraphView {
+        this.backgroundGraphColor = color
+        return this
+    }
+
+    fun setXAxisLineColor(@ColorRes color: Int): GraphView {
+        this.xAxisLineColor = color
+        return this
+    }
+
+    fun setXAxisLineWidth(width: Float): GraphView {
+        this.xAxisLineWidth = width
+        return this
+    }
+
+    fun setGraphDetails(graphDetails: GraphDetails) {
         this.graphDetails = graphDetails
+    }
+
+    fun drawState(graphState: GraphState) {
+        isValidDraw = true
+        indexPoint = graphState.index
+        graphLinePaint.xfermode = graphState.xfermode
         invalidate()
     }
+
+    fun dispose(){
+        isValidDraw = false
+    }
+
 
 }

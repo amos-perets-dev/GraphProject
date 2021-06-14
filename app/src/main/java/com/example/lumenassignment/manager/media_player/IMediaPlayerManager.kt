@@ -14,7 +14,7 @@ interface IMediaPlayerManager {
     /**
      * Call when the user click on the play button
      */
-    fun play(interval: Long)
+    fun play(intervalGraphDraw: Long)
 
     /**
      * Call when the user click on the stop button

@@ -40,12 +40,10 @@ class GraphView(context: Context, attrs: AttributeSet?) :
     private var distance = 0F
     private var graphWidth = 0
 
-    private var isValidDraw = false
-
     private var indexPoint = 0
 
     private val gestureDetector =
-        GestureDetector(getContext(), object : SimpleOnGestureListener() {
+        GestureDetector(context, object : SimpleOnGestureListener() {
             override fun onScroll(
                 e1: MotionEvent, e2: MotionEvent,
                 distanceX: Float, distanceY: Float
@@ -70,9 +68,9 @@ class GraphView(context: Context, attrs: AttributeSet?) :
                 mScroller.forceFinished(true)
 
                 mScroller.fling(
-                    scrollX,  // No startX as there is no horizontal scrolling
+                    scrollX,
                     0,
-                    (-velocityX).toInt(),  // No velocityX as there is no horizontal scrolling
+                    (-velocityX).toInt(),
                     0,
                     0,
                     maxScrollX,
@@ -110,8 +108,7 @@ class GraphView(context: Context, attrs: AttributeSet?) :
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        if (graphDetails == null || isValidDraw.not()) return
-
+        if (graphDetails == null) return
 
         if (mScroller.computeScrollOffset()) {
             scrollTo(mScroller.currX, mScroller.currY);
@@ -120,7 +117,7 @@ class GraphView(context: Context, attrs: AttributeSet?) :
         val xStep = graphDetails?.xStepDp ?: 0F
         val flowYPoints = graphDetails?.flowYPoints ?: arrayListOf()
 
-        val newWidth = (flowYPoints.size * xStep).toInt()
+        val newWidth = ((flowYPoints.size) * xStep).toInt()
         graphWidth = if (newWidth > this.width) {
             newWidth
         } else {
@@ -140,8 +137,9 @@ class GraphView(context: Context, attrs: AttributeSet?) :
 
             val yPoint = flowYPoints[index]
 
-            path.lineTo(((xStep * (index + 1))), yPoint)
+            path.lineTo(xStep * index, yPoint)
         }
+
         canvas.drawPath(path, graphLinePaint)
 
     }
@@ -175,15 +173,9 @@ class GraphView(context: Context, attrs: AttributeSet?) :
     }
 
     fun drawState(graphState: GraphState) {
-        isValidDraw = true
         indexPoint = graphState.index
         graphLinePaint.xfermode = graphState.xfermode
         invalidate()
     }
-
-    fun dispose(){
-        isValidDraw = false
-    }
-
 
 }

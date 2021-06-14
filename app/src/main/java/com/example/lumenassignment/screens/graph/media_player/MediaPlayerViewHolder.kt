@@ -1,6 +1,5 @@
 package com.example.lumenassignment.screens.graph.media_player
 
-import android.graphics.Color
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.ContextCompat
@@ -15,12 +14,11 @@ import kotlinx.android.synthetic.main.fragment_graph.view.*
 class MediaPlayerViewHolder(private val view: View) {
 
     private val activeColor = ContextCompat.getColor(view.context, R.color.teal_200)
+    private val inActiveColor = ContextCompat.getColor(view.context, R.color.black)
 
     private val buttonPlay = view.button_play
     private val buttonPause = view.button_pause
     private val buttonRewind = view.button_rewind
-
-    private var prevButton: AppCompatImageView? = null
 
     private val seekBar = view.seek_bar_graph_progress
 
@@ -44,16 +42,22 @@ class MediaPlayerViewHolder(private val view: View) {
     }
 
     fun getMediaPlayerState(): Observable<MediaPlayerState> {
-        return mediaPlayerState.hide().distinctUntilChanged()
-            .doOnNext {
-                val view = it.second
-                if (view is AppCompatImageView) {
-                    prevButton?.setColorFilter(Color.BLACK)
-                    view.setColorFilter(activeColor)
-                    prevButton = view
-                }
+        return mediaPlayerState.hide()
+            .distinctUntilChanged()
+            .scan { prevClick, currClick ->
+                setButtonState(prevClick.second, inActiveColor)
+                currClick
+            }
+            .doOnNext { currClick ->
+                setButtonState(currClick.second, activeColor)
             }
             .map { it.first }
+    }
+
+    private fun setButtonState(view: View, color: Int) {
+        if (view is AppCompatImageView) {
+            view.setColorFilter(color)
+        }
     }
 
     fun setProgressLength(progressLength: Int) {

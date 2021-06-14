@@ -12,8 +12,6 @@ import java.util.concurrent.TimeUnit
 
 class MediaPlayerManager(private val intervalGraphDraw: Long) : IMediaPlayerManager {
 
-    private val intervalGraphDrawFast = 0L
-
     private var progressLength = 0
     private var indexPoint = 0
 
@@ -40,29 +38,26 @@ class MediaPlayerManager(private val intervalGraphDraw: Long) : IMediaPlayerMana
     private fun playFast(index: Int) {
         dispose()
         if (index <= indexPoint) {
-
             eraseGraph.index = index
             notifyState(eraseGraph)
-            indexPoint = index
-
         } else {
-
             drawGraph.index = index
             notifyState(drawGraph)
-            indexPoint = index
         }
+        indexPoint = index
     }
 
-    override fun play(interval: Long) {
+    override fun play(intervalGraphDraw: Long) {
 
         dispose()
         disposable = getInterval(intervalGraphDraw)
             .filter { indexPoint + 1 < progressLength }
-            .doOnNext {
-                indexPoint++
-                drawGraph.index = indexPoint
-                notifyState(drawGraph)
+            .map { indexPoint++ }
+            .map { currIndex ->
+                drawGraph.index = currIndex
+                drawGraph
             }
+            .doOnNext(this::notifyState)
             ?.subscribePro()
     }
 
@@ -84,16 +79,16 @@ class MediaPlayerManager(private val intervalGraphDraw: Long) : IMediaPlayerMana
         if (indexPoint - 1 < 0) return
         disposable = getInterval(intervalGraphDraw)
             .filter { indexPoint >= 0 }
-            .doOnNext {
-                indexPoint--
-                eraseGraph.index = indexPoint
-                notifyState(eraseGraph)
+            .map { indexPoint-- }
+            .map { currIndex ->
+                eraseGraph.index = currIndex
+                eraseGraph
             }
+            .doOnNext(this::notifyState)
             .subscribePro()
     }
 
     private fun notifyState(graphState: GraphState) {
-        graphState.index = indexPoint
         progressPoint.onNext(graphState)
     }
 

@@ -86,7 +86,6 @@ class GraphFragment : FragmentBase() {
     }
 
     override fun onDestroyView() {
-        graphView.dispose()
         super.onDestroyView()
     }
 }

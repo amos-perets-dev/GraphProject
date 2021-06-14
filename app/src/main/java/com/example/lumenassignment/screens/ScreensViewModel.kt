@@ -1,6 +1,5 @@
 package com.example.lumenassignment.screens
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.example.lumenassignment.assignment.lumen.me.model.BreathItem
 import com.example.lumenassignment.assignment.lumen.me.model.GraphDetails
